@@ -10,6 +10,18 @@ const hashPassword = async (password) => {
     }
 }
 
+const comparePassword = async (password, passwordHashed) => {
+    try {
+        if (!password || !passwordHashed) throw new Error('Not have password or password hashed')
+        const isEqual = await bcrypt.compare(password, passwordHashed)
+
+        return isEqual
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     hashPassword,
+    comparePassword,
 }

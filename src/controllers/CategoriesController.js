@@ -1,10 +1,11 @@
-const Categories = require('../models/categoriesModel')
+const Category = require('../models/categoryModel')
+const Product = require('../models/productModel')
 
 const CategoriesController = {
     // get all category
     getAllCategory: async (req, res) => {
         try {
-            const categories = await Categories.find()
+            const categories = await Category.find().populate('products')
             res.status(200).json(categories)
         } catch (error) {
             res.status(500).json({ error, message: 'Get all category failed' })
@@ -14,7 +15,7 @@ const CategoriesController = {
     getCategoryById: async (req, res) => {
         try {
             const id = req.params.id
-            const category = await Categories.findOne({ _id: id })
+            const category = await Category.findOne({ _id: id })
             if (!category) {
                 return res.status(404).json({ message: 'Not found this category' })
             }
@@ -26,7 +27,7 @@ const CategoriesController = {
     // add category
     addCategory: async (req, res) => {
         try {
-            const category = new Categories({
+            const category = new Category({
                 name: req.body.name,
             })
             await category.save()
@@ -39,11 +40,11 @@ const CategoriesController = {
     updateCategory: async (req, res) => {
         try {
             const id = req.params.id
-            const category = await Categories.findOne({ _id: id })
+            const category = await Category.findOne({ _id: id })
             if (!category) {
                 return res.status(404).json({ message: 'Not found category to update' })
             }
-            const categoryUpdating = await Categories.findByIdAndUpdate(
+            const categoryUpdating = await Category.findByIdAndUpdate(
                 { _id: id },
                 {
                     name: req.body.name,
@@ -56,6 +57,18 @@ const CategoriesController = {
             })
         } catch (error) {
             res.status(500).json({ error, message: 'Update category failed' })
+        }
+    },
+    //delete category
+    removeCategory: async (req, res) => {
+        try {
+            const id = req.params.id
+            await Product.updateMany({ category: id }, { category: null })
+            await Category.findByIdAndDelete({ _id: id })
+
+            res.status(200).json({ message: 'Delete category successfully' })
+        } catch (error) {
+            res.status(500).json({ error, message: 'Delete this category failed' })
         }
     },
 }

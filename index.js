@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const dotenv = require('dotenv')
 const connectData = require('./config/data')
 const routes = require('./src/routes')
+const cookieParser = require('cookie-parser')
 const app = express()
 
 const port = process.env.PORT || 8000
@@ -16,6 +17,7 @@ app.use(morgan('common'))
 app.use(cors())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(cookieParser())
 
 // connect data
 connectData()

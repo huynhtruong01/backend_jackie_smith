@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const productsModel = new mongoose.Schema(
+const productModel = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -27,7 +27,8 @@ const productsModel = new mongoose.Schema(
             default: 0,
         },
         category: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: 'Category',
             required: true,
         },
         color: {
@@ -44,9 +45,13 @@ const productsModel = new mongoose.Schema(
     },
     {
         timestamps: true,
+        autoIndex: true,
     }
 )
+productModel.index({ name: 'text' })
 
-const Products = mongoose.model('Products', productsModel)
+const Product = mongoose.model('Product', productModel)
 
-module.exports = Products
+Product.createIndexes({ name: 'text' })
+
+module.exports = Product

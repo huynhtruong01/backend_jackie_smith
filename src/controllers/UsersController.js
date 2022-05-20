@@ -1,4 +1,4 @@
-const Users = require('../models/usersModel')
+const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const { hashPassword } = require('../utils/common')
 
@@ -6,7 +6,7 @@ const UsersController = {
     // get all user
     getAllUser: async (req, res) => {
         try {
-            const users = await Users.find()
+            const users = await User.find()
             res.status(200).json(users)
         } catch (error) {
             res.status(500).json({ error, message: 'Get all user failed' })
@@ -16,7 +16,7 @@ const UsersController = {
     getUserById: async (req, res) => {
         try {
             const id = req.params.id
-            const user = await Users.findById({ _id: id })
+            const user = await User.findById({ _id: id })
             if (!user) {
                 return res.status(404).json({ message: 'Not found this user' })
             }
@@ -32,7 +32,7 @@ const UsersController = {
             const user = req.body
             const salt = await bcrypt.genSalt(Number.parseInt(process.env.NUMBER_SALT))
             const passwordHashed = await bcrypt.hash(user.password, salt)
-            const userAdding = new Users({
+            const userAdding = new User({
                 username: user.username,
                 email: user.email,
                 password: passwordHashed,
@@ -67,11 +67,11 @@ const UsersController = {
     removeUser: async (req, res) => {
         try {
             const id = req.params.id
-            const user = await Users.findOne({ _id: id })
+            const user = await User.findOne({ _id: id })
             if (!user) {
                 return res.status(404).json({ message: 'Not found user to delete' })
             }
-            await Users.findByIdAndDelete({ _id: id })
+            await User.findByIdAndDelete({ _id: id })
             res.status(200).json({ message: 'Delete user successfully' })
         } catch (error) {
             res.status(500).json({ error, message: 'Delete user failed' })
