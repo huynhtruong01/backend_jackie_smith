@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const hashPassword = async (password) => {
     try {
@@ -21,7 +22,17 @@ const comparePassword = async (password, passwordHashed) => {
     }
 }
 
+const generateAccessToken = (payload) => {
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+}
+
+const generateRefreshToken = (payload) => {
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET)
+}
+
 module.exports = {
     hashPassword,
     comparePassword,
+    generateAccessToken,
+    generateRefreshToken,
 }

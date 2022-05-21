@@ -6,7 +6,7 @@ const ProductsController = {
     // get all products
     getAllProducts: async (req, res) => {
         try {
-            const features = new FeatureApi(Product.find(), req.query)
+            const features = new FeatureApi(Product.find().populate('category'), req.query)
                 .pagination()
                 .sorting()
                 .search()
@@ -14,9 +14,9 @@ const ProductsController = {
 
             const data = await Promise.allSettled([features.query, Product.countDocuments()])
             const products = data[0].status === 'fulfilled' ? data[0].value : []
-            const count = data[1].status === 'fulfilled' ? data[1].value : 0
+            const totalCount = data[1].status === 'fulfilled' ? data[1].value : 0
 
-            res.status(200).json({ products, count })
+            res.status(200).json({ products, totalCount })
         } catch (error) {
             res.status(500).json({ error, message: 'Get all product failed' })
         }

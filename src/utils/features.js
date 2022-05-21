@@ -1,3 +1,5 @@
+const mongoose = require('mongoose')
+
 function FeatureApi(query, querystring) {
     this.query = query
     this.querystring = querystring
@@ -31,7 +33,8 @@ function FeatureApi(query, querystring) {
 
     // filter
     this.filtering = () => {
-        const queryObj = { ...this.querystring }
+        let queryObj = { ...this.querystring }
+
         // delete [page, search, sort, limit]
         const containsObj = ['limit', 'page', 'sort', 'search']
         for (const query of containsObj) {

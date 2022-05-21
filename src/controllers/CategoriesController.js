@@ -6,7 +6,9 @@ const CategoriesController = {
     getAllCategory: async (req, res) => {
         try {
             const categories = await Category.find().populate('products')
-            res.status(200).json(categories)
+            const totalCount = await Category.countDocuments()
+
+            res.status(200).json({ categories, totalCount })
         } catch (error) {
             res.status(500).json({ error, message: 'Get all category failed' })
         }

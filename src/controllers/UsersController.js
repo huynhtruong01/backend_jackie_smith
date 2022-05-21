@@ -7,7 +7,9 @@ const UsersController = {
     getAllUser: async (req, res) => {
         try {
             const users = await User.find()
-            res.status(200).json(users)
+            const totalCount = await User.countDocuments()
+
+            res.status(200).json({ users, totalCount })
         } catch (error) {
             res.status(500).json({ error, message: 'Get all user failed' })
         }
@@ -50,7 +52,7 @@ const UsersController = {
             console.log(user)
             const id = req.params.id
             const password = await hashPassword(user.password)
-            const userUpdated = await Users.findOneAndUpdate(
+            const userUpdated = await User.findOneAndUpdate(
                 { _id: id },
                 {
                     username: user.username,
@@ -60,7 +62,7 @@ const UsersController = {
             )
             res.status(200).json({ user: userUpdated, message: 'Updated user successfully' })
         } catch (error) {
-            req.status(500).json({ error, message: 'Updated user failed' })
+            res.status(500).json({ error, message: 'Updated user failed' })
         }
     },
     // remove user

@@ -1,5 +1,6 @@
 const express = require('express')
 const UsersController = require('../controllers/UsersController')
+const { verifyTokenAndIsAdmin } = require('../utils/verify')
 const router = express.Router()
 
 router.get('/', UsersController.getAllUser)

@@ -6,7 +6,9 @@ const OrderController = {
     getAllOrder: async (req, res) => {
         try {
             const orders = await Order.find()
-            res.status(200).json(orders)
+            const totalCount = await Order.countDocuments()
+
+            res.status(200).json({ orders, totalCount })
         } catch (error) {
             res.status(500).json({ error, message: 'Get all order failed' })
         }
