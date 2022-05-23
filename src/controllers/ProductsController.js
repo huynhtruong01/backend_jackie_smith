@@ -47,7 +47,6 @@ const ProductsController = {
                 category,
                 color,
                 style,
-                bestSeller,
             } = req.body
 
             if (!category) {
@@ -70,7 +69,6 @@ const ProductsController = {
                 category: categoryByName._id,
                 color,
                 style,
-                bestSeller,
             })
             const saveProduct = await product.save()
 
@@ -96,7 +94,6 @@ const ProductsController = {
                 category,
                 color,
                 style,
-                bestSeller,
             } = req.body
             const productUpdated = await Product.findByIdAndUpdate(
                 { _id: id },
@@ -110,7 +107,6 @@ const ProductsController = {
                     category,
                     color,
                     style,
-                    bestSeller,
                 }
             )
 

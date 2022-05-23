@@ -38,10 +38,6 @@ const productModel = new mongoose.Schema(
         style: {
             type: String,
         },
-        bestSeller: {
-            type: Boolean,
-            default: false,
-        },
     },
     {
         timestamps: true,
