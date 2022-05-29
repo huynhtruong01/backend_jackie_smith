@@ -22,8 +22,10 @@ const UsersController = {
             if (!user) {
                 return res.status(404).json({ message: 'Not found this user' })
             }
+
             const { password, ...other } = user._doc
-            res.status(200).json(other)
+
+            res.status(200).json({ ...other })
         } catch (error) {
             res.status(500).json({ error, message: 'Get user by id failed' })
         }
@@ -32,13 +34,11 @@ const UsersController = {
     addUser: async (req, res) => {
         try {
             const user = req.body
+            console.log(user)
             const salt = await bcrypt.genSalt(Number.parseInt(process.env.NUMBER_SALT))
             const passwordHashed = await bcrypt.hash(user.password, salt)
-            const userAdding = new User({
-                username: user.username,
-                email: user.email,
-                password: passwordHashed,
-            })
+            const userAdding = new User({ ...user, password: passwordHashed })
+            console.log(userAdding)
             await userAdding.save()
             res.status(200).json({ user: userAdding, message: 'Add user successfully' })
         } catch (error) {
@@ -52,11 +52,15 @@ const UsersController = {
             console.log(user)
             const id = req.params.id
             const password = await hashPassword(user.password)
+            console.log(password)
             const userUpdated = await User.findOneAndUpdate(
                 { _id: id },
                 {
-                    username: user.username,
-                    password,
+                    $set: {
+                        address: user.address,
+                        phoneNumber: user.phoneNumber,
+                        password,
+                    },
                 },
                 { new: true }
             )

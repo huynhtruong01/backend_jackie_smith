@@ -2,13 +2,21 @@ const mongoose = require('mongoose')
 
 const userModel = new mongoose.Schema(
     {
-        username: {
+        fullname: {
+            type: String,
+            required: true,
+        },
+        email: {
             type: String,
             required: true,
             unique: true,
         },
-        email: {
+        address: {
             type: String,
+            required: true,
+        },
+        phoneNumber: {
+            type: Number,
             required: true,
             unique: true,
         },
@@ -17,9 +25,9 @@ const userModel = new mongoose.Schema(
             required: true,
             minlength: 6,
         },
-        isAdmin: {
-            type: Boolean,
-            default: false,
+        role: {
+            type: String,
+            default: 'customer',
         },
     },
     {
@@ -28,5 +36,13 @@ const userModel = new mongoose.Schema(
 )
 
 const User = mongoose.model('User', userModel)
+
+async function getIndex() {
+    const index = await User.collection.getIndexes()
+    return index
+}
+
+// User.collection.dropIndex('username_1')
+console.log(getIndex())
 
 module.exports = User

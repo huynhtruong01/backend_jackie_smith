@@ -12,7 +12,10 @@ const ProductsController = {
                 .search()
                 .filtering()
 
-            const data = await Promise.allSettled([features.query, Product.countDocuments()])
+            const data = await Promise.allSettled([
+                features.query,
+                Product.count(features.querystring),
+            ])
             const products = data[0].status === 'fulfilled' ? data[0].value : []
             const totalCount = data[1].status === 'fulfilled' ? data[1].value : 0
 
@@ -95,6 +98,13 @@ const ProductsController = {
                 color,
                 style,
             } = req.body
+
+            // get category by name
+            const categoryId = await Category.findOne({ name: category })
+            if (!categoryId) {
+                return res.status(404).json({ message: 'Not found category by name' })
+            }
+
             const productUpdated = await Product.findByIdAndUpdate(
                 { _id: id },
                 {
@@ -104,7 +114,7 @@ const ProductsController = {
                     originalPrice,
                     salePrice,
                     promotionPercent,
-                    category,
+                    category: categoryId,
                     color,
                     style,
                 }

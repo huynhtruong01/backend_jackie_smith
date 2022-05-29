@@ -25,14 +25,16 @@ const AuthController = {
     // login
     login: async (req, res) => {
         try {
-            const user = await User.findOne({ username: req.body.username })
+            const user = await User.findOne({ email: req.body.email })
             if (!user) {
-                return res.status(404).json({ message: 'Wrong username. Please try again' })
+                return res.status(404).json({ message: 'Not found this user' })
             }
 
-            const isPasswordEqual = await comparePassword(req.body.password, user.password)
-            if (!isPasswordEqual) {
-                return res.status(403).json({ message: 'Wrong password. Please try again' })
+            const isPasswordEqual = await comparePassword(req.body?.password, user.password)
+            if (!req.body?.email || !isPasswordEqual) {
+                return res
+                    .status(403)
+                    .json({ message: 'Wrong email or password. Please try again' })
             }
 
             // generate jwt

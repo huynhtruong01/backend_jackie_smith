@@ -10,6 +10,7 @@ function FeatureApi(query, querystring) {
         const skip = this.querystring.limit * (this.querystring.page - 1) || 0
         this.query = this.query.limit(limit).skip(skip)
 
+        console.log(this.querystring.limit)
         return this
     }
 

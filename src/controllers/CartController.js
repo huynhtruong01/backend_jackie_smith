@@ -5,7 +5,13 @@ const CartController = {
     // get all cart
     getAllCart: async (req, res) => {
         try {
-            const carts = await Cart.find()
+            const carts = await Cart.find().populate({
+                path: 'items',
+                populate: {
+                    path: 'product',
+                },
+            })
+
             const totalCount = await Cart.countDocuments()
 
             res.status(200).json({ carts, totalCount })
@@ -17,7 +23,7 @@ const CartController = {
     getCartById: async (req, res) => {
         try {
             const id = req.params.id
-            const cart = await Cart.findById({ _id: id }).populate({
+            const cart = await Cart.findOne({ userId: id }).populate({
                 path: 'items',
                 populate: {
                     path: 'product',
