@@ -37,12 +37,12 @@ const userModel = new mongoose.Schema(
 
 const User = mongoose.model('User', userModel)
 
-async function getIndex() {
-    const index = await User.collection.getIndexes()
-    return index
-}
+// async function getIndex() {
+//     const index = await User.collection.getIndexes()
+//     return index
+// }
 
 // User.collection.dropIndex('username_1')
-console.log(getIndex())
+// console.log(getIndex())
 
 module.exports = User

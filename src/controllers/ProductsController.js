@@ -43,7 +43,6 @@ const ProductsController = {
             const {
                 name,
                 description,
-                image,
                 originalPrice,
                 salePrice,
                 promotionPercent,
@@ -51,6 +50,11 @@ const ProductsController = {
                 color,
                 style,
             } = req.body
+
+            const urlImage = `${req.protocol}://${req.get('host')}/${req.file.path
+                .split('\\')
+                .slice(1)
+                .join('/')}`
 
             if (!category) {
                 return res.status(404).json({ message: 'Not found category to add' })
@@ -65,7 +69,7 @@ const ProductsController = {
             const product = new Product({
                 name,
                 description,
-                image,
+                image: urlImage,
                 originalPrice,
                 salePrice,
                 promotionPercent,
@@ -81,6 +85,7 @@ const ProductsController = {
             res.status(200).json({ product, message: 'Add product successfully' })
         } catch (error) {
             res.status(500).json({ error, message: 'Add product failed' })
+            console.log(error)
         }
     },
     // update product
@@ -90,7 +95,6 @@ const ProductsController = {
             const {
                 name,
                 description,
-                image,
                 originalPrice,
                 salePrice,
                 promotionPercent,
@@ -98,6 +102,18 @@ const ProductsController = {
                 color,
                 style,
             } = req.body
+
+            let image
+
+            if (!req.file) {
+                image = req.body.image
+            } else {
+                const urlImage = `${req.protocol}://${req.get('host')}/${req.file.path
+                    .split('\\')
+                    .slice(1)
+                    .join('/')}`
+                image = urlImage
+            }
 
             // get category by name
             const categoryId = await Category.findOne({ name: category })

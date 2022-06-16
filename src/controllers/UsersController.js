@@ -49,16 +49,21 @@ const UsersController = {
     updateUser: async (req, res) => {
         try {
             const user = req.body
-            console.log(user)
             const id = req.params.id
-            const password = await hashPassword(user.password)
-            console.log(password)
+            const userById = await User.findById({ _id: id })
+
+            let password
+            if (user?.password) {
+                password = await hashPassword(user.password)
+            } else {
+                password = userById.password
+            }
+
             const userUpdated = await User.findOneAndUpdate(
                 { _id: id },
                 {
                     $set: {
-                        address: user.address,
-                        phoneNumber: user.phoneNumber,
+                        ...user,
                         password,
                     },
                 },

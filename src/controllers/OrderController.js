@@ -6,6 +6,15 @@ const OrderController = {
     getAllOrder: async (req, res) => {
         try {
             const orders = await Order.find()
+                .populate({
+                    path: 'items',
+                    populate: {
+                        path: 'product',
+                    },
+                })
+                .populate('userId')
+                .exec()
+
             const totalCount = await Order.countDocuments()
 
             res.status(200).json({ orders, totalCount })
@@ -17,12 +26,15 @@ const OrderController = {
     getOrderById: async (req, res) => {
         try {
             const id = req.params.id
-            const order = await Order.findById({ _id: id }).populate({
-                path: 'items',
-                populate: {
-                    path: 'product',
-                },
-            })
+            const order = await Order.findById({ _id: id })
+                .populate({
+                    path: 'items',
+                    populate: {
+                        path: 'product',
+                    },
+                })
+                .populate('userId')
+
             if (!order) {
                 return res.status(404).json({ message: 'Not found this order' })
             }
@@ -37,58 +49,67 @@ const OrderController = {
         try {
             // get order by userId, item
             const userId = req.body.userId
-            const item = {
-                product: req.body.product,
-                quantity: Number.parseInt(req.body.quantity),
-            }
-            const order = await Order.findOne({ userId })
 
-            // if it have,
+            const productList = req.body.productList
+            const quantity = Number.parseInt(req.body.totalQuantity)
+            const price = Number.parseInt(req.body.totalPrice)
+
+            const order = await Order.findOne({ userId })
+            console.log('Order', order)
             if (order) {
-                const items = order.items.map((item) => item.product + '')
-                // if it contain product, update quantity
-                if (items.includes(item.product)) {
-                    const index = items.findIndex((x) => {
-                        return x == item.product
-                    })
-                    const quantityProduct = order.items[index].quantity
-                    const orderUpdated = await Order.findOneAndUpdate(
-                        {
-                            userId,
-                            items: { $elemMatch: { product: item.product } },
-                        },
-                        {
-                            $set: {
-                                'items.$.quantity':
-                                    Number.parseInt(quantityProduct) + item.quantity,
-                                totalPrice: order.totalPrice + Number.parseInt(req.body.totalPrice),
-                            },
-                        },
-                        {
-                            new: true,
-                        }
-                    )
-                    return res.status(200).json({
-                        order: orderUpdated,
-                        message: 'Added and updated quantity product of order successfully',
-                    })
-                } else {
-                    // otherwise, push into items
-                    order.totalPrice += Number.parseInt(req.body.totalPrice)
-                    order.items.push(item)
-                    await order.save()
-                    return res
-                        .status(200)
-                        .json({ order, message: 'Added product into order successfully' })
-                }
+                // if it contain date, update quantity
+
+                const newProductList = productList.map((item) => {
+                    return {
+                        product: item.product._id,
+                        quantity: item.quantity,
+                        size: item.size,
+                    }
+                })
+                order.items.push(...newProductList)
+                const totalQuantity = order.totalQuantity + quantity
+                const totalPrice = order.totalPrice + price
+                const numberInvoice = order.numberInvoice + 1
+
+                const orderUpdate = await Order.findOneAndUpdate(
+                    { userId },
+                    {
+                        items: order.items,
+                        totalQuantity,
+                        totalPrice,
+                        numberInvoice,
+                    },
+                    {
+                        new: true,
+                    }
+                )
+
+                res.status(200).json({
+                    order: orderUpdate,
+                    message: 'Add product and quantity successfully',
+                })
             } else {
                 // otherwise, create order
+                const newProductList = req.body.productList.map((item) => {
+                    return {
+                        product: item.product,
+                        quantity: item.quantity,
+                        size: item.size,
+                    }
+                })
+
+                console.log(newProductList)
                 const newOrder = new Order({
                     userId,
-                    items: [item],
-                    totalPrice: req.body.totalPrice,
                     address: req.body.address,
+                    phoneNumber: req.body.phoneNumber,
+                    items: [...newProductList],
+                    totalPrice: price,
+                    totalQuantity: quantity,
+                    numberInvoice: 1,
                 })
+
+                console.log('newOrder', newOrder)
 
                 const saveNewOrder = await newOrder.save()
 
