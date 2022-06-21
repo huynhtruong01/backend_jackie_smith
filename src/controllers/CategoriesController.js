@@ -46,7 +46,7 @@ const CategoriesController = {
             if (!category) {
                 return res.status(404).json({ message: 'Not found category to update' })
             }
-            const categoryUpdating = await Category.findByIdAndUpdate(
+            const categoryUpdated = await Category.findByIdAndUpdate(
                 { _id: id },
                 {
                     name: req.body.name,
@@ -54,7 +54,7 @@ const CategoriesController = {
                 { new: true }
             )
             res.status(200).json({
-                category: categoryUpdating,
+                category: categoryUpdated,
                 message: 'Updated category successfully',
             })
         } catch (error) {
