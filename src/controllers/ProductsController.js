@@ -1,16 +1,23 @@
 const Category = require('../models/categoryModel')
+const Color = require('../models/colorModel')
 const Product = require('../models/productModel')
+const Style = require('../models/styleModel')
 const FeatureApi = require('../utils/features')
 
 const ProductsController = {
     // get all products
     getAllProducts: async (req, res) => {
         try {
-            const features = new FeatureApi(Product.find().populate('category'), req.query)
+            const features = new FeatureApi(
+                Product.find().populate('category').populate('style').populate('color'),
+                req.query
+            )
                 .pagination()
                 .sorting()
                 .search()
                 .filtering()
+
+            console.log(req.query, features.querystring)
 
             const data = await Promise.allSettled([
                 features.query,
@@ -28,7 +35,11 @@ const ProductsController = {
     getProductById: async (req, res) => {
         try {
             const id = req.params.id
-            const product = await Product.findById({ _id: id }).populate('category')
+            const product = await Product.findById({ _id: id })
+                .populate('category')
+                .populate('style')
+                .populate('color')
+
             if (!product) {
                 return res.status(404).json({ message: 'Not found this product' })
             }
@@ -61,8 +72,15 @@ const ProductsController = {
             }
 
             // get category by name
-            const categoryByName = await Category.findOne({ name: category })
-            if (!categoryByName) {
+            const categoryName = await Category.findOne({ name: category })
+
+            // get color by name
+            const colorName = await Color.findOne({ name: color })
+
+            // get style by name
+            const styleName = await Style.findOne({ name: style })
+
+            if (!categoryName || !styleName || !colorName) {
                 return res.status(404).json({ message: 'Not found category by name' })
             }
 
@@ -73,14 +91,16 @@ const ProductsController = {
                 originalPrice,
                 salePrice,
                 promotionPercent,
-                category: categoryByName._id,
-                color,
-                style,
+                category: categoryName._id,
+                color: colorName._id,
+                style: styleName._id,
             })
             const saveProduct = await product.save()
 
             // push product into category
-            await categoryByName.updateOne({ $push: { products: saveProduct._id } })
+            await categoryName.updateOne({ $push: { products: saveProduct._id } })
+            await colorName.updateOne({ $push: { products: saveProduct._id } })
+            await styleName.updateOne({ $push: { products: saveProduct._id } })
 
             res.status(200).json({ product, message: 'Add product successfully' })
         } catch (error) {
@@ -117,6 +137,11 @@ const ProductsController = {
 
             // get category by name
             const categoryId = await Category.findOne({ name: category })
+            // get style by name
+            const styleId = await Style.findOne({ name: style })
+            // get color by name
+            const colorId = await Color.findOne({ name: color })
+
             if (!categoryId) {
                 return res.status(404).json({ message: 'Not found category by name' })
             }
@@ -130,9 +155,9 @@ const ProductsController = {
                     originalPrice,
                     salePrice,
                     promotionPercent,
-                    category: categoryId,
-                    color,
-                    style,
+                    category: categoryId?._id,
+                    color: colorId?._id,
+                    style: styleId?._id,
                 }
             )
 

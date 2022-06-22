@@ -42,6 +42,7 @@ const CategoriesController = {
     updateCategory: async (req, res) => {
         try {
             const id = req.params.id
+            console.log(req.params)
             const category = await Category.findOne({ _id: id })
             if (!category) {
                 return res.status(404).json({ message: 'Not found category to update' })

@@ -1,9 +1,11 @@
+const Category = require('../models/categoryModel')
 const Style = require('../models/styleModel')
+const CategoriesController = require('./CategoriesController')
 
 const StylesController = {
     getAllStyle: async (req, res) => {
         try {
-            const styles = await Style.find().populate('product')
+            const styles = await Style.find().populate('products').populate('category')
             const totalCount = await Style.countDocuments()
 
             res.status(200).json({ styles, totalCount })
@@ -14,7 +16,10 @@ const StylesController = {
     getStyleById: async (req, res) => {
         try {
             const id = req.params.id
-            const style = await Style.findById({ _id: id }).populate('product')
+            const style = await Style.findById({ _id: id })
+                .populate('products')
+                .populate('category')
+
             if (!style) {
                 res.status(404).json({ message: 'Not found style by id' })
                 return
@@ -28,8 +33,11 @@ const StylesController = {
     addStyle: async (req, res) => {
         try {
             const name = req.body.name
+
+            const category = await Category.findOne({ name: req.body.category })
             const style = new Style({
                 name,
+                category: category._id,
             })
 
             await style.save()
@@ -42,12 +50,15 @@ const StylesController = {
     updateStyle: async (req, res) => {
         try {
             const id = req.params.id
-            const name = req.body.name
+            console.log(req.params.id, req.body.name)
 
-            const style = Style.findByIdAndUpdate(
+            const categoryName = await Category.findOne({ name: req.body.category })
+
+            const style = await Style.findByIdAndUpdate(
                 { _id: id },
                 {
-                    name,
+                    name: req.body.name,
+                    category: categoryName._id,
                 },
                 {
                     new: true,

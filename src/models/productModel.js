@@ -32,11 +32,12 @@ const productModel = new mongoose.Schema(
             required: true,
         },
         color: {
-            type: String,
-            required: true,
+            type: mongoose.Types.ObjectId,
+            ref: 'Color',
         },
         style: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: 'Style',
         },
     },
     {

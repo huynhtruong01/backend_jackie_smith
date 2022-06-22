@@ -3,7 +3,7 @@ const Color = require('../models/colorModel')
 const ColorsController = {
     getAllColor: async (req, res) => {
         try {
-            const colors = await Color.find().populate('product')
+            const colors = await Color.find().populate('products')
             const totalCount = await Color.countDocuments()
 
             res.status(200).json({ colors, totalCount })
@@ -14,7 +14,8 @@ const ColorsController = {
     getColorById: async (req, res) => {
         try {
             const id = req.params.id
-            const color = await Color.findById({ _id: id }).populate('product')
+            const color = await Color.findById({ _id: id }).populate('products')
+
             if (!color) {
                 res.status(404).json({ message: 'Not found color by id' })
                 return
@@ -44,7 +45,7 @@ const ColorsController = {
             const id = req.params.id
             const name = req.body.name
 
-            const color = Color.findByIdAndUpdate(
+            const color = await Color.findByIdAndUpdate(
                 { _id: id },
                 {
                     name,

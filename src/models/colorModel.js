@@ -6,7 +6,7 @@ const colorModel = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    product: [
+    products: [
         {
             type: mongoose.Types.ObjectId,
             ref: 'Product',

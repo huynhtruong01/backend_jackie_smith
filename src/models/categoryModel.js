@@ -13,6 +13,12 @@ const categoryModel = new mongoose.Schema(
                 ref: 'Product',
             },
         ],
+        styles: [
+            {
+                type: mongoose.Types.ObjectId,
+                ref: 'Style',
+            },
+        ],
     },
     {
         timestamps: true,

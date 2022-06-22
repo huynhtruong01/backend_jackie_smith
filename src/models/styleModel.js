@@ -6,12 +6,16 @@ const styleModel = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    product: [
+    products: [
         {
             type: mongoose.Types.ObjectId,
             ref: 'Product',
         },
     ],
+    category: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Category',
+    },
 })
 
 const Style = mongoose.model('Style', styleModel)
