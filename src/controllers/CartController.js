@@ -14,7 +14,7 @@ const CartController = {
                 })
                 .populate('userId')
 
-            console.log(carts)
+            // console.log(carts)
 
             const totalCount = await Cart.countDocuments()
 
@@ -35,8 +35,9 @@ const CartController = {
                     },
                 })
                 .populate('userId')
+
             if (!cart) {
-                return res.status(200).json(undefined)
+                return res.status(200).json(null)
             }
 
             res.status(200).json(cart)
@@ -56,9 +57,11 @@ const CartController = {
                     },
                 })
                 .populate('userId')
-            console.log(cart)
+
+            // console.log(cart)
+
             if (!cart) {
-                return res.status(200).json(undefined)
+                return res.status(200).json(null)
             }
 
             res.status(200).json(cart)
@@ -88,7 +91,7 @@ const CartController = {
                 const getFindProduct = cart.items.find(
                     (x) => x.product == item.product && x.size === item.size
                 )
-                console.log(getFindProduct)
+                // console.log(getFindProduct)
                 if (products.includes(item.product) && getFindProduct?.size === item.size) {
                     const cartUpdated = await Cart.findOneAndUpdate(
                         { userId, items: { $elemMatch: { product: item.product } } },
@@ -179,10 +182,14 @@ const CartController = {
                     .json({ message: 'Not found cart by id. Please add new cart' })
             }
             const items = cart.items.filter((item) => item._id != req.body.product)
-            console.log(items)
+            // console.log(items)
             const cartUpdated = await Cart.findOneAndUpdate(
                 { userId: id },
-                { items },
+                {
+                    $set: {
+                        items,
+                    },
+                },
                 {
                     new: true,
                 }
@@ -193,7 +200,7 @@ const CartController = {
             res.status(500).json({ error, message: 'Update cart failed' })
         }
     },
-    // clear all cart of this user
+    // delete all cart of this user
     removeAllCartItem: async (req, res) => {
         try {
             const id = req.body.userId

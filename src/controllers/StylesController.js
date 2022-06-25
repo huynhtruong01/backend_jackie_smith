@@ -30,6 +30,20 @@ const StylesController = {
             res.status(500).json({ error, message: 'Get by id style failed' })
         }
     },
+    getStyleByCategory: async (req, res) => {
+        try {
+            const styles = await Style.find({ category: req.params.id })
+            // console.log(styles)
+
+            if (!styles.length) {
+                return res.status(404).json({ message: 'Not found this style' })
+            }
+
+            res.status(200).json({ styles, message: 'Get style by category successfully' })
+        } catch (error) {
+            res.status(500).json({ message: 'Get style by category failed' })
+        }
+    },
     addStyle: async (req, res) => {
         try {
             const name = req.body.name
@@ -40,7 +54,8 @@ const StylesController = {
                 category: category._id,
             })
 
-            await style.save()
+            const saveStyle = await style.save()
+            await category.updateOne({ $push: { styles: saveStyle._id } })
 
             res.status(200).json({ style, message: 'Add style successfully' })
         } catch (error) {

@@ -13,7 +13,6 @@ const OrderController = {
                     },
                 })
                 .populate('userId')
-                .exec()
 
             const totalCount = await Order.countDocuments()
 
@@ -53,12 +52,11 @@ const OrderController = {
             const productList = req.body.productList
             const quantity = Number.parseInt(req.body.totalQuantity)
             const price = Number.parseInt(req.body.totalPrice)
+            const address = req.body.address
 
             const order = await Order.findOne({ userId })
-            console.log('Order', order)
+            // console.log('Order', order)
             if (order) {
-                // if it contain date, update quantity
-
                 const newProductList = productList.map((item) => {
                     return {
                         product: item.product._id,
@@ -66,6 +64,7 @@ const OrderController = {
                         size: item.size,
                     }
                 })
+
                 order.items.push(...newProductList)
                 const totalQuantity = order.totalQuantity + quantity
                 const totalPrice = order.totalPrice + price
@@ -74,10 +73,13 @@ const OrderController = {
                 const orderUpdate = await Order.findOneAndUpdate(
                     { userId },
                     {
-                        items: order.items,
-                        totalQuantity,
-                        totalPrice,
-                        numberInvoice,
+                        $set: {
+                            items: order.items,
+                            totalQuantity,
+                            totalPrice,
+                            numberInvoice,
+                            address,
+                        },
                     },
                     {
                         new: true,
@@ -98,7 +100,7 @@ const OrderController = {
                     }
                 })
 
-                console.log(newProductList)
+                // console.log(newProductList)
                 const newOrder = new Order({
                     userId,
                     address: req.body.address,
@@ -109,7 +111,7 @@ const OrderController = {
                     numberInvoice: 1,
                 })
 
-                console.log('newOrder', newOrder)
+                // console.log('newOrder', newOrder)
 
                 const saveNewOrder = await newOrder.save()
 
@@ -122,45 +124,49 @@ const OrderController = {
         }
     },
     // update order
-    updateOrder: async (req, res) => {
-        try {
-            const order = await Order.findById(req.params.id)
-            if (!order) {
-                return res.status(404).json({ message: 'Not found order to update' })
-            }
+    // updateOrder: async (req, res) => {
+    //     try {
+    //         const id = req.params.id
 
-            const items = order.items.filter(
-                (item) => String(item.product) !== String(req.body.product)
-            )
+    //         const order = await Order.findById({ _id: id })
 
-            const quantity = order.items.find((x) => String(x.product) == String(req.body.product))
-            const product = await Product.findById({ _id: req.body.product })
-            const priceProduct = Number.parseInt(product.salePrice) * Number.parseInt(quantity)
+    //         if (!order) {
+    //             return res.status(404).json({ message: 'Not found order to update' })
+    //         }
 
-            console.log(quantity)
-            const orderUpdated = await Order.findByIdAndUpdate(
-                { _id: req.params.id },
-                {
-                    $set: {
-                        items: items,
-                        totalPrice: Number.parseInt(order.totalPrice) - priceProduct,
-                    },
-                },
-                {
-                    new: true,
-                }
-            )
+    // const items = order.items.filter(
+    //     (item) => String(item.product) !== String(req.body.product)
+    // )
 
-            res.status(200).json({ order: orderUpdated, message: 'Updated order success' })
-        } catch (error) {
-            res.status(500).json({ error, message: 'Updated order failed' })
-        }
-    },
+    // const quantity = order.items.find((x) => String(x.product) == String(req.body.product))
+    // const product = await Product.findById({ _id: req.body.product })
+    // const priceProduct = Number.parseInt(product.salePrice) * Number.parseInt(quantity)
+
+    // console.log(quantity)
+    // const orderUpdated = await Order.findByIdAndUpdate(
+    //     { _id: req.params.id },
+    //     {
+    //         $set: {
+    //             items: items,
+    //             totalPrice: Number.parseInt(order.totalPrice) - priceProduct,
+    //         },
+    //     },
+    //     {
+    //         new: true,
+    //     }
+    // )
+
+    //         res.status(200).json({ order: orderUpdated, message: 'Updated order success' })
+    //     } catch (error) {
+    //         res.status(500).json({ error, message: 'Updated order failed' })
+    //     }
+    // },
     // delete order
     removeOrder: async (req, res) => {
         try {
             const id = req.params.id
             const order = await Order.findById({ _id: id })
+
             if (!order) {
                 return res.status(500).json({ message: 'Not found order to delete' })
             }

@@ -5,7 +5,7 @@ const CategoriesController = {
     // get all category
     getAllCategory: async (req, res) => {
         try {
-            const categories = await Category.find().populate('products')
+            const categories = await Category.find().populate('products').populate('styles')
             const totalCount = await Category.countDocuments()
 
             res.status(200).json({ categories, totalCount })
@@ -17,7 +17,10 @@ const CategoriesController = {
     getCategoryById: async (req, res) => {
         try {
             const id = req.params.id
-            const category = await Category.findOne({ _id: id }).populate('products')
+            const category = await Category.findOne({ _id: id })
+                .populate('products')
+                .populate('styles')
+
             if (!category) {
                 return res.status(404).json({ message: 'Not found this category' })
             }

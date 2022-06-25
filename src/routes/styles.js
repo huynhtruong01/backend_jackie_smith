@@ -4,6 +4,7 @@ const router = express.Router()
 
 router.get('/', StylesController.getAllStyle)
 router.get('/:id', StylesController.getStyleById)
+router.get('/category/:id', StylesController.getStyleByCategory)
 router.post('/', StylesController.addStyle)
 router.put('/:id', StylesController.updateStyle)
 router.delete('/:id', StylesController.removeStyle)
