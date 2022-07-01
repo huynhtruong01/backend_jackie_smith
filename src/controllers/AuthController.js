@@ -59,7 +59,40 @@ const AuthController = {
                 message: 'Login successfully',
             })
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error, message: 'Login failed. Please try again' })
+        }
+    },
+    // login google
+    loginGoogle: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email })
+            console.log(user)
+
+            if (user) {
+                const { password, ...rest } = user._doc
+                return res.status(200).json({ user: { ...rest }, message: 'Login google success' })
+            }
+
+            const newPassword = req.body.email
+            const passwordHashed = await hashPassword(newPassword)
+
+            const newUser = new User({
+                fullname: req.body.fullname,
+                email: req.body.email,
+                password: passwordHashed,
+            })
+
+            console.log(newUser)
+
+            await newUser.save()
+
+            const { password, ...rest } = newUser._doc
+            console.log(rest)
+
+            res.status(200).json({ user: { ...rest }, message: 'Login google successfully' })
+        } catch (error) {
+            res.status(500).json({ error, message: 'Login failed' })
         }
     },
     // request refresh token

@@ -11,10 +11,6 @@ const userModel = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        phoneNumber: {
-            type: String,
-            required: true,
-        },
         password: {
             type: String,
             required: true,
@@ -37,7 +33,7 @@ const User = mongoose.model('User', userModel)
 //     return index
 // }
 
-// User.collection.dropIndex('username_1')
+// User.collection.dropIndex('phoneNumber_1')
 // console.log(getIndex())
 
 module.exports = User

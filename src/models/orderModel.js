@@ -3,8 +3,15 @@ const mongoose = require('mongoose')
 const orderModel = new mongoose.Schema(
     {
         userId: {
-            type: mongoose.Types.ObjectId,
-            ref: 'User',
+            type: String,
+            required: true,
+        },
+        fullname: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
             required: true,
         },
         address: {
@@ -17,10 +24,6 @@ const orderModel = new mongoose.Schema(
         },
         items: [
             {
-                dayPay: {
-                    type: Date,
-                    default: Date.now,
-                },
                 product: {
                     type: mongoose.Types.ObjectId,
                     ref: 'Product',
@@ -44,9 +47,13 @@ const orderModel = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        numberInvoice: {
-            type: Number,
-            default: 0,
+        isCheckout: {
+            type: String,
+            default: false,
+            required: true,
+        },
+        mode: {
+            type: String,
             required: true,
         },
     },
@@ -56,5 +63,11 @@ const orderModel = new mongoose.Schema(
 )
 
 const Order = mongoose.model('Order', orderModel)
+// async function getIndex() {
+//     const index = await Order.collection.getIndexes()
+//     return index
+// }
+// Order.collection.dropIndex('userId_1')
+// console.log(getIndex())
 
 module.exports = Order

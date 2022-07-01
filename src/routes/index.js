@@ -8,6 +8,7 @@ const routerCart = require('./carts')
 const routerOrder = require('./orders')
 const routerStyles = require('./styles')
 const routerColors = require('./colors')
+const routerCheckout = require('./checkout')
 
 const routes = [
     router.use('/products', routerProducts),
@@ -18,6 +19,7 @@ const routes = [
     router.use('/auth', routerAuth),
     router.use('/carts', routerCart),
     router.use('/orders', routerOrder),
+    router.use('/checkout', routerCheckout),
 ]
 
 module.exports = routes
