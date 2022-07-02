@@ -43,6 +43,26 @@ const OrderController = {
             res.status(500).json({ error, message: 'Get all order failed' })
         }
     },
+    // get all order successful
+    getAllOrderSuccess: async (req, res) => {
+        try {
+            const orders = await Order.find()
+                .populate({
+                    path: 'items',
+                    populate: {
+                        path: 'product',
+                    },
+                })
+                .populate('userId')
+
+            const totalCount = await Order.countDocuments()
+            const newOrders = orders.filter((order) => order.mode === 'successful delivery')
+
+            res.status(200).json({ orders: newOrders, totalCount })
+        } catch (error) {
+            res.status(500).json({ error, message: 'Get all order failed' })
+        }
+    },
     // get all by userId
     getAllByUserId: async (req, res) => {
         try {
