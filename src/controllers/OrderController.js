@@ -22,6 +22,24 @@ const OrderController = {
             res.status(500).json({ error, message: 'Get all order failed' })
         }
     },
+    getAllByUserIdOther: async (req, res) => {
+        try {
+            const orders = await Order.find({ userId: req.body.userId })
+                .populate({
+                    path: 'items',
+                    populate: {
+                        path: 'product',
+                    },
+                })
+                .populate('userId')
+
+            const totalCount = await Order.countDocuments()
+
+            res.status(200).json({ orders, totalCount })
+        } catch (error) {
+            res.status(500).json({ error, message: 'Get all order failed' })
+        }
+    },
     getAllOrderApproved: async (req, res) => {
         try {
             const orders = await Order.find()
