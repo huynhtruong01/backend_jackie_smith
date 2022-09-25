@@ -1,4 +1,5 @@
 const express = require('express')
+const AuthController = require('../controllers/AuthController')
 const ProductsController = require('../controllers/ProductsController')
 const upload = require('../utils/upload')
 const router = express.Router()

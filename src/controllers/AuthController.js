@@ -9,6 +9,14 @@ const jwt = require('jsonwebtoken')
 
 let refreshTokens = []
 
+const verifyToken = async (token) => {
+    try {
+        return await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 const AuthController = {
     // register
     register: async (req, res) => {
@@ -38,8 +46,8 @@ const AuthController = {
             }
 
             // generate jwt
-            const accessToken = generateAccessToken({ id: user._id, email: user.email })
-            const refreshToken = generateRefreshToken({ id: user._id, email: user.email })
+            const accessToken = generateAccessToken({ id: user._id })
+            const refreshToken = generateRefreshToken({ id: user._id })
             refreshTokens.push(refreshToken)
 
             // save refreshToken into cookie
@@ -139,6 +147,59 @@ const AuthController = {
             res.status(200).json({ message: 'Logout successfully' })
         } catch (error) {
             res.status(500).json({ error, message: 'Logout failed' })
+        }
+    },
+    protect: async (req, res, next) => {
+        try {
+            if (
+                !req.headers['authorization'] &&
+                !req.headers['authorization'].startsWith('Bearer')
+            ) {
+                return res.status(401).json({
+                    message: 'Not exits token',
+                })
+            }
+
+            const token = await verifyToken(req.headers['authorization'].split(' ')[1])
+            if (!token) {
+                return res.status(401).json({
+                    message: 'You not logged in! Please login to get access',
+                })
+            }
+
+            const user = await User.findById(token.id)
+            if (!user) {
+                return res.status(401).json({
+                    message: 'Not exits user. Please register to login!',
+                })
+            }
+
+            req.user = user
+
+            next()
+        } catch (error) {
+            res.status(500).json({
+                error,
+                message: error.message,
+            })
+        }
+    },
+    restrictTo: (...roles) => {
+        return async (req, res, next) => {
+            try {
+                if (!roles.includes(req.user.role)) {
+                    return res.status(200).json({
+                        message: "You don't have permission to access",
+                    })
+                }
+
+                next()
+            } catch (error) {
+                res.status(500).json({
+                    error,
+                    message: error.message,
+                })
+            }
         }
     },
 }
