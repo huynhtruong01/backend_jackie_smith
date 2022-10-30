@@ -48,7 +48,7 @@ const StylesController = {
         try {
             const name = req.body.name
 
-            const category = await Category.findOne({ name: req.body.category })
+            const category = await Category.findOne({ name: req.body.category.toLowerCase() })
             const style = new Style({
                 name,
                 category: category._id,
