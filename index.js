@@ -14,9 +14,11 @@ const passportSetup = require('./src/utils/passport')
 const port = process.env.PORT || 5000
 
 // config dotenv
-dotenv.config()
+dotenv.config({
+    path: './.env',
+})
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(`${__dirname}/public`))
 // use morgan, cors, json, passport
 app.use(morgan('common'))
 
