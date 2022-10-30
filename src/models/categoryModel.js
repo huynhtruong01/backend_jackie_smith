@@ -6,6 +6,7 @@ const categoryModel = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
+            lowercase: true,
         },
         products: [
             {

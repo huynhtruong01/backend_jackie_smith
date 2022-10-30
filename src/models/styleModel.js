@@ -5,6 +5,7 @@ const styleModel = new mongoose.Schema({
         type: String,
         unique: true,
         required: true,
+        lowercase: true,
     },
     products: [
         {
