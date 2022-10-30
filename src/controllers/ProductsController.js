@@ -62,10 +62,9 @@ const ProductsController = {
                 style,
             } = req.body
 
-            const urlImage = `${req.protocol}://${req.get('host')}/${req.file.path
-                .split('\\')
-                .slice(1)
-                .join('/')}`
+            const urlImage = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+
+            console.log(req.body)
 
             if (!category) {
                 return res.status(404).json({ message: 'Not found category to add' })

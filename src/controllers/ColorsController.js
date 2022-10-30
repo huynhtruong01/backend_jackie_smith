@@ -28,7 +28,7 @@ const ColorsController = {
     },
     addColor: async (req, res) => {
         try {
-            const name = req.body.name
+            const name = req.body.name.toLowerCase()
             const color = new Color({
                 name,
             })
