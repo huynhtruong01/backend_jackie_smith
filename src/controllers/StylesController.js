@@ -35,7 +35,7 @@ const StylesController = {
             const styles = await Style.find({ category: req.params.id })
             // console.log(styles)
 
-            if (!styles.length) {
+            if (!styles) {
                 return res.status(404).json({ message: 'Not found this style' })
             }
 
