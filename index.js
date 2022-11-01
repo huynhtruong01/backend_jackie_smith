@@ -31,7 +31,7 @@ app.use(cookieSession({ name: 'session', keys: ['huynh_truong'], maxAge: 24 * 60
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use(cors())
+// app.use(cors())
 
 // connect data
 connectData()
