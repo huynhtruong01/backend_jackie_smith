@@ -10,6 +10,7 @@ const path = require('path')
 const passport = require('passport')
 const cookieSession = require('cookie-session')
 const passportSetup = require('./src/utils/passport')
+const cors = require('cors');
 
 const port = process.env.PORT || 5000
 
@@ -31,7 +32,13 @@ app.use(cookieSession({ name: 'session', keys: ['huynh_truong'], maxAge: 24 * 60
 app.use(passport.initialize())
 app.use(passport.session())
 
-// app.use(cors())
+
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,            
+    optionSuccessStatus:200
+}
+app.use(cors(corsOptions))
 
 // connect data
 connectData()
