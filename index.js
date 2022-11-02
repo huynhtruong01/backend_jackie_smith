@@ -32,7 +32,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://jackie-smith-fe-be.vercel.app', 'https://dashboard-jackie-smith-fe-be.vercel.app'],
     credentials: true,
     optionSuccessStatus: 200,
 }
