@@ -359,6 +359,49 @@ const OrderController = {
             res.status(500).json({ error, message: 'Delete order failed' })
         }
     },
+    // update order
+    updateOrder: async (req, res) => {
+        try {
+            const { productList } = req.body
+
+            const order = await Order.findById(req.params.id)
+
+            // remove each product in order
+            const removeEachProduct = await productList.forEach(async (product) => {
+                await Order.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                        items: {
+                            $pull: {
+                                product: product.id,
+                            },
+                        },
+                        totalPrice: { $inc: -Number.parseInt(product.price) },
+                        totalQuantity: {
+                            $inc: -Number.parseInt(product.quantity),
+                        },
+                    },
+                    {
+                        new: true,
+                        runValidators: true,
+                    }
+                )
+            })
+
+            await Promise.allSettled([removeEachProduct])
+
+            // check items in order empty?
+            if (order?.items?.length === 0) {
+                await Order.findByIdAndDelete(req.params.id)
+            }
+
+            res.status(200).json({
+                message: 'Remove product success.',
+            })
+        } catch (error) {
+            res.status(500).json({ error, message: 'Delete product failed.' })
+        }
+    },
 }
 
 module.exports = OrderController

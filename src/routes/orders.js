@@ -14,5 +14,6 @@ router.put('/update-approved/:id', OrderController.updateApproved)
 router.put('/update-shipping/:id', OrderController.updateShipping)
 router.put('/update-delivery/:id', OrderController.updateSuccessfulDelivery)
 router.delete('/:id', OrderController.removeOrder)
+router.put('/update-order/:id', OrderController.updateOrder)
 
 module.exports = router
