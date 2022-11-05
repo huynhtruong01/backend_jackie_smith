@@ -362,23 +362,34 @@ const OrderController = {
     // update order
     updateOrder: async (req, res) => {
         try {
-            const { productList } = req.body
+            const { productIdList } = req.body // list id of product
 
-            const order = await Order.findById(req.params.id)
+            let order = await Order.findById(req.params.id).populate({
+                path: 'items',
+                populate: {
+                    path: 'product',
+                },
+            })
+            // console.log(order.items, productIdList)
 
             // remove each product in order
-            const removeEachProduct = await productList.forEach(async (product) => {
+            const removeEachProduct = await productIdList.forEach(async (id, index) => {
+                const item = order.items.find((x) => x?.product._id.toString() === id)
+                // console.log(item)
+
                 await Order.findByIdAndUpdate(
                     req.params.id,
                     {
-                        items: {
-                            $pull: {
-                                product: product.id,
+                        $pull: {
+                            items: {
+                                _id: item._id,
                             },
                         },
-                        totalPrice: { $inc: -Number.parseInt(product.price) },
-                        totalQuantity: {
-                            $inc: -Number.parseInt(product.quantity),
+                        $inc: {
+                            totalPrice: -(Number.parseInt(item.product?.salePrice) * item.quantity),
+                        },
+                        $inc: {
+                            totalQuantity: -Number.parseInt(item.quantity),
                         },
                     },
                     {
@@ -390,7 +401,11 @@ const OrderController = {
 
             await Promise.allSettled([removeEachProduct])
 
+            order = await Order.findById(req.params.id)
+            // console.log(order.items)
+
             // check items in order empty?
+            console.log(order?.items)
             if (order?.items?.length === 0) {
                 await Order.findByIdAndDelete(req.params.id)
             }
@@ -399,6 +414,7 @@ const OrderController = {
                 message: 'Remove product success.',
             })
         } catch (error) {
+            // console.log(error)
             res.status(500).json({ error, message: 'Delete product failed.' })
         }
     },

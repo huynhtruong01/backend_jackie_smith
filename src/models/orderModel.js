@@ -27,11 +27,10 @@ const orderModel = new mongoose.Schema(
                 product: {
                     type: mongoose.Types.ObjectId,
                     ref: 'Product',
-                    required: true,
                 },
                 quantity: {
                     type: Number,
-                    required: true,
+                    default: 0,
                 },
                 size: {
                     type: String,
@@ -41,16 +40,15 @@ const orderModel = new mongoose.Schema(
         ],
         totalPrice: {
             type: Number,
-            required: true,
+            default: 0,
         },
         totalQuantity: {
             type: Number,
-            required: true,
+            default: 0,
         },
         isCheckout: {
             type: String,
             default: false,
-            required: true,
         },
         mode: {
             type: String,
