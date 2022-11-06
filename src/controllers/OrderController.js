@@ -364,7 +364,7 @@ const OrderController = {
         try {
             const { productIdList } = req.body // list id of product
 
-            let order = await Order.findById(req.params.id).populate({
+            const order = await Order.findById(req.params.id).populate({
                 path: 'items',
                 populate: {
                     path: 'product',
@@ -373,40 +373,43 @@ const OrderController = {
             // console.log(order.items, productIdList)
 
             // remove each product in order
-            const removeEachProduct = await productIdList.forEach(async (id, index) => {
-                const item = order.items.find((x) => x?.product._id.toString() === id)
-                // console.log(item)
+            const removeEachProduct = productIdList.forEach(async (id, index) => {
+                try {
+                    const item = order.items.find((x) => x?.product._id.toString() === id)
+                    // console.log(item)
 
-                await Order.findByIdAndUpdate(
-                    req.params.id,
-                    {
-                        $pull: {
-                            items: {
-                                _id: item._id,
+                    await Order.findByIdAndUpdate(
+                        req.params.id,
+                        {
+                            $pull: {
+                                items: {
+                                    _id: item._id,
+                                },
+                            },
+                            $inc: {
+                                totalPrice: -(
+                                    Number.parseInt(item.product?.salePrice) * item.quantity
+                                ),
+                            },
+                            $inc: {
+                                totalQuantity: -Number.parseInt(item.quantity),
                             },
                         },
-                        $inc: {
-                            totalPrice: -(Number.parseInt(item.product?.salePrice) * item.quantity),
-                        },
-                        $inc: {
-                            totalQuantity: -Number.parseInt(item.quantity),
-                        },
-                    },
-                    {
-                        new: true,
-                        runValidators: true,
-                    }
-                )
+                        {
+                            new: true,
+                            runValidators: true,
+                        }
+                    )
+                } catch (error) {
+                    console.log(error)
+                }
             })
 
             await Promise.allSettled([removeEachProduct])
 
-            order = await Order.findById(req.params.id)
-            // console.log(order.items)
-
             // check items in order empty?
             console.log(order?.items)
-            if (order?.items?.length === 0) {
+            if (order?.items?.length === productIdList.length) {
                 await Order.findByIdAndDelete(req.params.id)
             }
 
